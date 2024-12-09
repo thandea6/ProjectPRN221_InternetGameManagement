@@ -44,7 +44,12 @@ namespace ProjectPRN221_InternetGameManagement
             app.UseAuthorization();
             app.UseSession(); // Kích hoạt session
 
-            app.MapRazorPages();
+			app.MapGet("/", async context =>
+			{
+				context.Response.Redirect("/login");
+			});
+
+			app.MapRazorPages();
 
             app.Run();
         }
