@@ -1,0 +1,40 @@
+﻿@page
+@model ProjectPRN221_InternetGameManagement.Pages.Manager.UpdateModel
+@{
+	ViewData["Title"] = "Update User";
+	Layout = null; // Tắt layout cho trang này
+}
+<h2>Update User</h2>
+
+<!-- Form hiển thị thông tin người dùng và cho phép cập nhật mật khẩu -->
+<form method="post">
+    <div>
+        <label>Username</label>
+        <input type="text" value="@Model.Username" disabled /> <!-- Hiển thị Username nhưng không cho phép chỉnh sửa -->
+    </div>
+    <div>
+        <label>Role</label>
+        <input type="text" value="@Model.Role" disabled /> <!-- Hiển thị Role nhưng không cho phép chỉnh sửa -->
+    </div>
+    <div>
+        <label>Time (minutes)</label>
+        <input type="number" value="@Model.Time" disabled /> <!-- Hiển thị Time nhưng không cho phép chỉnh sửa -->
+    </div>
+    <div>
+        <label>New Password</label>
+        <input type="password" asp-for="Password" required />
+    </div>
+    <button type="submit">Update Password</button>
+</form>
+
+<button onclick="location.href='@Url.Page("/Manager/List")'">Back to List</button>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color:red">@Model.ErrorMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color:green">@Model.SuccessMessage</p>
+}

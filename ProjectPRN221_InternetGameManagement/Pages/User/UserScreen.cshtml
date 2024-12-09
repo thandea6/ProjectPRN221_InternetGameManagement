@@ -1,0 +1,117 @@
+﻿@page
+@using Microsoft.AspNetCore.Antiforgery
+@model ProjectPRN221_InternetGameManagement.Pages.User.UserScreenModel
+@inject IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "User Page";
+    var antiforgeryToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Screen</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .countdown {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .logout-button {
+            background-color: #f44336;
+        }
+
+        .buy-button {
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-right">
+        <button class="button buy-button" onclick="location.href='@Url.Page("/Product/Buy")'">Buy</button>
+        <button class="button logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="countdown" id="countdown">@Model.RemainingTime</div>
+
+    <script>
+        let remainingTime = @Model.RemainingMinutes * 60; // Thời gian còn lại, tính bằng giây
+        let intervalId;
+
+        function updateCountdown() {
+            if (remainingTime <= 0) {
+                document.getElementById('countdown').textContent = "00h00m00s";
+                clearInterval(intervalId); // Dừng đếm ngược khi thời gian đạt đến 0
+                updateTimeOnServer(0); // Lưu thời gian là 0 vào database khi kết thúc
+                return;
+            }
+
+            remainingTime--;
+
+            let hours = Math.floor(remainingTime / 3600);
+            let minutes = Math.floor((remainingTime % 3600) / 60);
+            let seconds = remainingTime % 60;
+
+            document.getElementById('countdown').textContent = `${String(hours).padStart(2, '0')}h${String(minutes).padStart(2, '0')}m${String(seconds).padStart(2, '0')}s`;
+
+            // Cập nhật thời gian lên server mỗi giây
+            updateTimeOnServer(Math.floor(remainingTime / 60));
+        }
+
+        function updateTimeOnServer(remainingMinutes) {
+            fetch('@Url.Page("/User/UserScreen", "UpdateTime")', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": "@antiforgeryToken"
+                },
+                body: JSON.stringify({ remainingMinutes: remainingMinutes })
+            }).then(response => response.json())
+                .then(data => console.log("Server response:", data))
+                .catch(error => console.error("Error updating time on server:", error));
+        }
+
+        // Bắt đầu đếm ngược và cập nhật mỗi giây
+        intervalId = setInterval(updateCountdown, 1000);
+
+        function logout() {
+            // Lưu thời gian còn lại vào cơ sở dữ liệu khi người dùng nhấn "Logout"
+            updateTimeOnServer(Math.floor(remainingTime / 60));
+            clearInterval(intervalId); // Dừng đếm ngược
+            location.href = '@Url.Page("/Login")'; // Điều hướng về trang login
+        }
+    </script>
+</body>
+</html>

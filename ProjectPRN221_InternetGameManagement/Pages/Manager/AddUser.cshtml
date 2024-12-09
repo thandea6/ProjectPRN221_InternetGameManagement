@@ -1,0 +1,37 @@
+﻿@page
+@model ProjectPRN221_InternetGameManagement.Pages.Manager.AddUserModel
+@{
+	ViewData["Title"] = "Add User";
+	Layout = null; // Tắt layout cho trang này
+}
+<h2>Add User</h2>
+
+<!-- Nút Back để quay lại trang List -->
+<button onclick="location.href='@Url.Page("/Manager/List")'">Back to List</button>
+
+<!-- Form thêm người dùng mới -->
+<form method="post">
+    <div>
+        <label>Username</label>
+        <input type="text" asp-for="Username" required />
+    </div>
+    <div>
+        <label>Password</label>
+        <input type="password" asp-for="Password" required />
+    </div>
+    <div>
+        <label>Initial Time (minutes)</label>
+        <input type="number" asp-for="Time" min="0" required />
+    </div>
+    <button type="submit">Add User</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color:red">@Model.ErrorMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color:green">@Model.SuccessMessage</p>
+}

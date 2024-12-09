@@ -1,0 +1,42 @@
+﻿@page "{accountId:int}"
+@model ProjectPRN221_InternetGameManagement.Pages.Manager.PayModel
+@{
+    ViewData["Title"] = "User Bill";
+	Layout = null; // Tắt layout cho trang này
+}
+<h2>Bill for User @Model.Account.Username</h2>
+
+@if (Model.BillDetails.Any())
+{
+    <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in Model.BillDetails)
+            {
+                <tr>
+                    <td>@detail.Product?.Name ?? "Unknown"</td>
+                    <td>@detail.Quantity</td>
+                    <td>@detail.Price</td>
+                    <td>@detail.TotalPrice</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p>Total Amount: $<span>@Model.TotalAmount</span></p>
+
+    <form method="post" asp-page-handler="ConfirmPayment" asp-route-accountId="@Model.Account.Id">
+        <button type="submit" onclick="return confirm('Are you sure you want to complete the payment?');">Thanh toán</button>
+    </form>
+}
+else
+{
+    <p>No bill available for this user.</p>
+}

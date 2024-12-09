@@ -1,0 +1,36 @@
+﻿@page
+@model ProjectPRN221_InternetGameManagement.Pages.Product.UpdateProductModel
+@{
+    ViewData["Title"] = "Update Product";
+    Layout = null;
+}
+
+<h2>Update Product</h2>
+
+<form method="post">
+    <!-- Trường ẩn cho ID sản phẩm -->
+    <input type="hidden" asp-for="Product.Id" />
+
+    <!-- Hiển thị tên sản phẩm dưới dạng chỉ đọc -->
+    <div>
+        <label>Name:</label>
+        <input asp-for="Product.Name" readonly />
+        <span asp-validation-for="Product.Name" class="text-danger"></span>
+    </div>
+
+    <!-- Hiển thị category dưới dạng chỉ đọc -->
+    <div>
+        <label>Category:</label>
+        <input asp-for="Product.Category" readonly />
+        <span asp-validation-for="Product.Category" class="text-danger"></span>
+    </div>
+
+    <!-- Cho phép cập nhật giá sản phẩm -->
+    <div>
+        <label>Price:</label>
+        <input asp-for="Product.Price" />
+        <span asp-validation-for="Product.Price" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Update</button>
+</form>

@@ -1,0 +1,47 @@
+﻿@page
+@model ProjectPRN221_InternetGameManagement.Pages.Product.ListModel
+@{
+    ViewData["Title"] = "Product List";
+	Layout = null;
+}
+
+<!-- Nút "Back" để quay lại trang Manager/List -->
+<div style="position: absolute; top: 10px; right: 10px;">
+    <button onclick="location.href='@Url.Page("/Manager/List")'">Back to Manager</button>
+</div>
+
+<h2>Product List</h2>
+
+<!-- Nút để chuyển đến trang thêm sản phẩm mới -->
+<button onclick="location.href='@Url.Page("/Product/AddProduct")'">Add Product</button>
+
+<!-- Danh sách sản phẩm -->
+<table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+                <td>@product.Price</td>
+                <td>
+                    <!-- Nút Update để cập nhật sản phẩm -->
+                    <button onclick="location.href='@Url.Page("/Product/UpdateProduct", new { id = product.Id })'">Update</button>
+
+                    <!-- Nút Delete để xóa sản phẩm, chuyển đến trang Delete -->
+                    <button onclick="location.href='@Url.Page("/Product/Delete", new { id = product.Id })'">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,26 @@
+﻿@page
+@model ProjectPRN221_InternetGameManagement.Pages.Manager.AddTimeModel
+@{
+	ViewData["Title"] = "Deposit";
+	Layout = null; // Tắt layout cho trang này
+}
+<h2>Deposit Time for User</h2>
+
+<p>Current User: @Model.Username</p>
+<p>Current Time: @Model.CurrentTime minutes</p>
+
+<!-- Form nạp tiền -->
+<form method="post">
+    <div>
+        <label>Amount (VND)</label>
+        <input type="number" asp-for="Amount" min="0" required />
+    </div>
+    <button type="submit">Deposit</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color:green">@Model.SuccessMessage</p>
+}
+
+<button onclick="location.href='@Url.Page("/Manager/List")'">Back to List</button>
