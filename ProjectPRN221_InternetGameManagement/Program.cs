@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProjectPRN221_InternetGameManagement.Hubs;
 using ProjectPRN221_InternetGameManagement.Models;
 
 namespace ProjectPRN221_InternetGameManagement
@@ -16,6 +17,7 @@ namespace ProjectPRN221_InternetGameManagement
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddSession(); // Thêm session
+            builder.Services.AddSignalR(); // Thêm SignalR
 
             builder.Services.AddAntiforgery(options =>
             {
@@ -48,8 +50,9 @@ namespace ProjectPRN221_InternetGameManagement
 			{
 				context.Response.Redirect("/login");
 			});
+            app.MapHub<SignalRServer>("/SignalRServer"); // Map SignalR hub
 
-			app.MapRazorPages();
+            app.MapRazorPages();
 
             app.Run();
         }
