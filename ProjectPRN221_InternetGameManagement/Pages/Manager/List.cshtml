@@ -2,10 +2,10 @@
 @model ProjectPRN221_InternetGameManagement.Pages.Manager.ListModel
 @{
     ViewData["Title"] = "Manage Users";
-    Layout = null; // Tắt layout cho trang này
+    Layout = null; // Không sử dụng layout
 }
 
-<!-- Nút Logout ở góc phải trên cùng -->
+<!-- Nút Logout và Product ở góc phải -->
 <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 10px;">
     <button onclick="location.href='@Url.Page("/Product/List")'" style="width: 100px; height: 40px;">Product</button>
     <form method="post" asp-page-handler="Logout">
@@ -15,22 +15,13 @@
 
 <h2>Manage Users</h2>
 
-<!-- Thanh tìm kiếm người dùng -->
-<form method="get">
-    <input type="text" asp-for="SearchQuery" placeholder="Search by username" />
-    <button type="submit">Search</button>
-</form>
-
-<!-- Nút thêm tài khoản người dùng mới -->
-<button onclick="location.href='@Url.Page("/Manager/AddUser")'">Add User</button>
-
 <!-- Bảng hiển thị danh sách người dùng -->
 <table border="1" cellpadding="10" cellspacing="0">
     <thead>
         <tr>
             <th>Username</th>
             <th>Role</th>
-            <th>Time</th> <!-- Thêm cột Time -->
+            <th>Time</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -40,18 +31,11 @@
             <tr>
                 <td>@user.Username</td>
                 <td>@user.Role</td>
-                <td>@user.FormattedTime</td> <!-- Hiển thị thời gian theo định dạng 00h00m -->
+                <td>@user.FormattedTime</td>
                 <td>
-                    <!-- Nút Update để cập nhật mật khẩu -->
                     <button onclick="location.href='@Url.Page("/Manager/Update", new { id = user.Id })'">Update</button>
-
-                    <!-- Nút Delete để xóa tài khoản người dùng -->
                     <button onclick="confirmDelete('@user.Id')">Delete</button>
-
-                    <!-- Nút Deposit để chuyển đến trang nạp tiền -->
                     <button onclick="location.href='@Url.Page("/Manager/AddTime", new { id = user.Id })'">Deposit</button>
-
-                    <!-- Nút Pay để chuyển đến trang thanh toán -->
                     <button onclick="location.href='@Url.Page("/Manager/Pay", new { accountId = user.Id })'">Pay</button>
                 </td>
             </tr>
@@ -59,7 +43,48 @@
     </tbody>
 </table>
 
+<h3>Order Logs</h3>
+<table border="1" cellpadding="10" cellspacing="0" id="orderLogTable">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody id="orderLogBody">
+        <!-- Thông báo sẽ được thêm qua SignalR -->
+    </tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
 <script>
+    // Kết nối SignalR
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl('/orderHub') // Đường dẫn đến SignalR Hub
+        .build();
+
+    connection.start().then(() => {
+        console.log('SignalR connected.');
+    }).catch(err => console.error('Error connecting to SignalR:', err));
+
+    // Lắng nghe sự kiện "ReceiveOrderNotification" từ server
+    connection.on('ReceiveOrderNotification', (username, products, time) => {
+        const orderLogBody = document.getElementById('orderLogBody');
+        const row = document.createElement('tr');
+        const timeCell = document.createElement('td');
+        const messageCell = document.createElement('td');
+
+        timeCell.textContent = time;
+
+        // Format nội dung thông báo
+        const productDetails = products.map(p => `${p.name} x${p.quantity}`).join(', ');
+        messageCell.textContent = `${username} đã order ${productDetails}`;
+
+        row.appendChild(timeCell);
+        row.appendChild(messageCell);
+        orderLogBody.appendChild(row);
+    });
+
     // Hàm xác nhận xóa tài khoản
     function confirmDelete(userId) {
         if (confirm("Are you sure you want to delete this account?")) {

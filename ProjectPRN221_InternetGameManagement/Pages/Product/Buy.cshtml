@@ -6,18 +6,15 @@
 }
 <h2>Select Product</h2>
 
-<!-- Nút Back để quay lại trang User/UserManager -->
 <div style="position: absolute; top: 10px; right: 10px;">
     <button onclick="location.href='@Url.Page("/User/UserScreen")'">Back</button>
 </div>
 
-<!-- Combobox Filter -->
 <label for="categoryFilter">Filter by Category:</label>
 <select id="categoryFilter" asp-for="SelectedCategory" asp-items="Model.Categories" onchange="filterProducts()">
     <option value="">All Categories</option>
 </select>
 
-<!-- List of Products -->
 <table border="1" cellpadding="10" cellspacing="0">
     <thead>
         <tr>
@@ -37,10 +34,9 @@
                 <td>@product.Category</td>
                 <td>@product.Price</td>
                 <td>
-                    <!-- Form POST để thêm sản phẩm vào bill -->
-                    <form method="post" asp-page-handler="AddToBill">
+                    <form method="post" asp-page-handler="AddToCart">
                         <input type="hidden" name="productId" value="@product.Id" />
-                        <button type="submit">Buy</button>
+                        <button type="submit">Add to Cart</button>
                     </form>
                 </td>
             </tr>
@@ -48,19 +44,17 @@
     </tbody>
 </table>
 
-<!-- Bill Section -->
-<h3>Bill</h3>
-<table border="1" cellpadding="10" cellspacing="0" id="billTable">
+<h3>Cart</h3>
+<table border="1" cellpadding="10" cellspacing="0" id="cartTable">
     <thead>
         <tr>
             <th>Product Name</th>
             <th>Quantity</th>
             <th>Price</th>
             <th>Total Price</th>
-            <th>Actions</th>
         </tr>
     </thead>
-    <tbody id="billItems">
+    <tbody id="cartItems">
         @foreach (var detail in Model.BillDetails)
         {
             <tr>
@@ -68,17 +62,37 @@
                 <td>@detail.Quantity</td>
                 <td>@detail.Price</td>
                 <td>@detail.TotalPrice</td>
-                <td>
-                    <form method="post" asp-page-handler="DeleteBillDetail" asp-route-billDetailId="@detail.Id">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
             </tr>
         }
     </tbody>
 </table>
 
 <p>Total: $<span id="totalAmount">@Model.TotalAmount</span></p>
+
+<form method="post" asp-page-handler="SubmitCart">
+    <button type="submit">Submit Cart</button>
+</form>
+
+<h3>Order History</h3>
+<table border="1" cellpadding="10" cellspacing="0" id="orderHistoryTable">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Time</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+    <tbody id="orderHistoryItems">
+        @foreach (var order in Model.OrderHistory)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.OrderTime</td>
+                <td>@order.TotalAmount</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 <script>
     function filterProducts() {

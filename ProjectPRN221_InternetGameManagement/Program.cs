@@ -56,6 +56,7 @@ namespace ProjectPRN221_InternetGameManagement
                 context.Response.Redirect("/login");
             });
             app.MapHub<SignalRServer>("/SignalRServer"); // Map SignalR hub
+            app.MapHub<OrderHub>("/orderHub");
 
             app.MapRazorPages();
 
