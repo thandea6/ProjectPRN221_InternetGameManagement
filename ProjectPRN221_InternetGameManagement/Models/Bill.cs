@@ -13,7 +13,7 @@ namespace ProjectPRN221_InternetGameManagement.Models
         public int Id { get; set; }
         public int AccountId { get; set; }
         public DateTime OrderTime { get; set; }
-        public decimal TotalAmount { get; set;}
+        public decimal TotalAmount { get; set; }
         public virtual Account Account { get; set; } = null!;
         public virtual ICollection<BillDetail> BillDetails { get; set; }
     }
