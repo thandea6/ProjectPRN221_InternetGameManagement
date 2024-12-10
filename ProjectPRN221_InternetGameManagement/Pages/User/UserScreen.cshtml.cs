@@ -31,10 +31,15 @@ namespace ProjectPRN221_InternetGameManagement.Pages.User
             if (user != null)
             {
                 RemainingMinutes = user.Time ?? 0;
+
+                // Log giá trị lấy được từ cơ sở dữ liệu
+                Console.WriteLine($"Loaded remaining minutes for user {userId}: {RemainingMinutes}");
+
                 RemainingTime = $"{RemainingMinutes / 60:D2}h{RemainingMinutes % 60:D2}m";
             }
             else
             {
+                Console.WriteLine($"User with ID {userId} not found.");
                 RemainingMinutes = 0;
                 RemainingTime = "00h00m";
             }
@@ -52,9 +57,23 @@ namespace ProjectPRN221_InternetGameManagement.Pages.User
 
                 if (user != null)
                 {
-                    user.Time = remainingMinutes;
-                    _context.SaveChanges();
-                    Console.WriteLine($"Updated remaining time for user {userId}: {remainingMinutes} minutes");
+                    Console.WriteLine($"Received remaining minutes: {remainingMinutes}");
+
+                    // Chỉ cập nhật nếu remainingMinutes hợp lệ
+                    if (remainingMinutes > 0)
+                    {
+                        user.Time = remainingMinutes;
+                        _context.SaveChanges();
+                        Console.WriteLine($"Updated database for user {userId}: {remainingMinutes} minutes");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid remaining minutes ({remainingMinutes}) received. Update skipped.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"User with ID {userId} not found.");
                 }
             }
 

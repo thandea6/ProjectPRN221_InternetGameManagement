@@ -14,6 +14,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Screen</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
     <style>
         body {
             display: flex;
@@ -67,50 +68,69 @@
     <div class="countdown" id="countdown">@Model.RemainingTime</div>
 
     <script>
-        let remainingTime = @Model.RemainingMinutes * 60; // Thời gian còn lại, tính bằng giây
+        const userId = @HttpContext.Session.GetInt32("UserId");
+        let remainingTime = @Model.RemainingMinutes * 60; // Thời gian còn lại tính bằng giây
         let intervalId;
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/SignalRServer")
+            .build();
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        // Cập nhật thời gian còn lại định kỳ vào cơ sở dữ liệu (mỗi 5 giây)
+        setInterval(() => {
+            const minutes = Math.floor(remainingTime / 60);
+            updateTimeOnServer(minutes);
+        }, 5000);
 
         function updateCountdown() {
             if (remainingTime <= 0) {
                 document.getElementById('countdown').textContent = "00h00m00s";
-                clearInterval(intervalId); // Dừng đếm ngược khi thời gian đạt đến 0
-                updateTimeOnServer(0); // Lưu thời gian là 0 vào database khi kết thúc
+                clearInterval(intervalId);
+                updateTimeOnServer(0); // Lưu giá trị 0 vào cơ sở dữ liệu
                 return;
             }
 
             remainingTime--;
 
-            let hours = Math.floor(remainingTime / 3600);
-            let minutes = Math.floor((remainingTime % 3600) / 60);
-            let seconds = remainingTime % 60;
+            const hours = Math.floor(remainingTime / 3600);
+            const minutes = Math.floor((remainingTime % 3600) / 60);
+            const seconds = remainingTime % 60;
 
             document.getElementById('countdown').textContent = `${String(hours).padStart(2, '0')}h${String(minutes).padStart(2, '0')}m${String(seconds).padStart(2, '0')}s`;
 
-            // Cập nhật thời gian lên server mỗi giây
-            updateTimeOnServer(Math.floor(remainingTime / 60));
+            // Gửi thời gian đếm ngược đến SignalR hub
+            connection.invoke("UpdateTimer", userId, Math.floor(remainingTime / 60))
+                .catch(err => console.error(err.toString()));
         }
 
         function updateTimeOnServer(remainingMinutes) {
-            fetch('@Url.Page("/User/UserScreen", "UpdateTime")', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "RequestVerificationToken": "@antiforgeryToken"
-                },
-                body: JSON.stringify({ remainingMinutes: remainingMinutes })
-            }).then(response => response.json())
-                .then(data => console.log("Server response:", data))
-                .catch(error => console.error("Error updating time on server:", error));
+            // Chỉ gửi nếu remainingMinutes lớn hơn 0
+            if (remainingMinutes > 0) {
+                fetch('@Url.Page("/User/UserScreen", "UpdateTime")', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": "@antiforgeryToken"
+                    },
+                    body: JSON.stringify({ remainingMinutes: remainingMinutes })
+                }).then(response => response.json())
+                    .then(data => console.log("Server response:", data))
+                    .catch(error => console.error("Error updating time on server:", error));
+            } else {
+                console.warn("Attempted to send invalid remainingMinutes:", remainingMinutes);
+            }
         }
 
-        // Bắt đầu đếm ngược và cập nhật mỗi giây
+
+        // Bắt đầu đếm ngược
         intervalId = setInterval(updateCountdown, 1000);
 
         function logout() {
-            // Lưu thời gian còn lại vào cơ sở dữ liệu khi người dùng nhấn "Logout"
-            updateTimeOnServer(Math.floor(remainingTime / 60));
+            updateTimeOnServer(Math.floor(remainingTime / 60)); // Lưu thời gian trước khi đăng xuất
             clearInterval(intervalId); // Dừng đếm ngược
-            location.href = '@Url.Page("/Login")'; // Điều hướng về trang login
+            location.href = '@Url.Page("/Login")'; // Chuyển hướng đến trang đăng nhập
         }
     </script>
 </body>
