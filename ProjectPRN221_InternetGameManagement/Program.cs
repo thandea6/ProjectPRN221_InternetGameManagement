@@ -16,7 +16,12 @@ namespace ProjectPRN221_InternetGameManagement
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddSession(); // Thêm session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session là 30 phút
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            }); // Thêm session với cấu hình thời gian timeout
             builder.Services.AddSignalR(); // Thêm SignalR
 
             builder.Services.AddAntiforgery(options =>
@@ -46,10 +51,10 @@ namespace ProjectPRN221_InternetGameManagement
             app.UseAuthorization();
             app.UseSession(); // Kích hoạt session
 
-			app.MapGet("/", async context =>
-			{
-				context.Response.Redirect("/login");
-			});
+            app.MapGet("/", async context =>
+            {
+                context.Response.Redirect("/login");
+            });
             app.MapHub<SignalRServer>("/SignalRServer"); // Map SignalR hub
 
             app.MapRazorPages();
