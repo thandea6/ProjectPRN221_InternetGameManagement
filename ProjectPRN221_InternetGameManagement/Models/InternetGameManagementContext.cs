@@ -7,8 +7,10 @@ namespace ProjectPRN221_InternetGameManagement.Models
 {
     public partial class InternetGameManagementContext : DbContext
     {
+        public static InternetGameManagementContext Ins = new InternetGameManagementContext();
         public InternetGameManagementContext()
         {
+            if(Ins != null) Ins = this;
         }
 
         public InternetGameManagementContext(DbContextOptions<InternetGameManagementContext> options)
