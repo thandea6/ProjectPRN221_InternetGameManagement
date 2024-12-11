@@ -1,54 +1,20 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using ProjectPRN221_InternetGameManagement.Models;
 
 namespace ProjectPRN221_InternetGameManagement.Hubs
 {
     public class SignalRServer : Hub
     {
-        public async Task UpdateTimer(int userId, int remainingMinutes)
+        public async Task UpdateRemainingTime(int userId, int remainingTime)
         {
-            await Clients.All.SendAsync("ReceiveTimerUpdate", userId, remainingMinutes);
-        }
-
-        private static readonly Dictionary<string, string> UserConnections = new Dictionary<string, string>();
-
-        public override Task OnConnectedAsync()
-        {
-            var username = Context.User?.Identity?.Name;
-            if (username != null && !UserConnections.ContainsKey(username))
+            // Cập nhật dữ liệu vào database
+            var user = await InternetGameManagementContext.Ins.Accounts.FindAsync(userId);
+            if (user != null)
             {
-                UserConnections.Add(username, Context.ConnectionId);
+                user.Time = remainingTime;  // Cập nhật thời gian còn lại trong database
+                await InternetGameManagementContext.Ins.SaveChangesAsync();
             }
-            return base.OnConnectedAsync();
-        }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            var username = Context.User?.Identity?.Name;
-            if (username != null && UserConnections.ContainsKey(username))
-            {
-                UserConnections.Remove(username);
-            }
-            return base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task SendMessageToAdmin(string message)
-        {
-            if (UserConnections.TryGetValue("Admin", out var adminConnectionId))
-            {
-                var user = Context.User?.Identity?.Name;
-                if (user != null)
-                {
-                    await Clients.Client(adminConnectionId).SendAsync("ReceiveMessage", user, message);
-                }
-            }
-        }
-
-        public async Task SendMessageToUser(string user, string message)
-        {
-            if (UserConnections.TryGetValue(user, out var userConnectionId))
-            {
-                await Clients.Client(userConnectionId).SendAsync("ReceiveMessage", "admin", message);
-            }
-        }
     }
 }
