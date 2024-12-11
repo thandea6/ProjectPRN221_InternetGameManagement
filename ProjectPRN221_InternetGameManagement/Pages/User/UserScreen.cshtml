@@ -57,6 +57,39 @@
         .buy-button {
             background-color: #4CAF50;
         }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        .chat-input {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+        .send-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -64,7 +97,45 @@
         <button class="button buy-button" onclick="location.href='@Url.Page("/Product/Buy")'">Buy</button>
         <button class="button logout-button" onclick="logout()">Logout</button>
     </div>
+    <div class="chat-container">
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Message" />
+            <button class="send-button" onclick="sendMessage()">Send</button>
+        </div>
+        <ul id="messagesList"></ul>
+        <div id="confirmationMessage" style="display: none; color: green; margin-top: 10px;">Message sent!</div>
+    </div>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/SignalRServer")
+            .build();
+
+        connection.on("ReceiveMessage", (user, message) => {
+            const li = document.createElement("li");
+            li.textContent = `${user}: ${message}`;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessageToAdmin", message)
+                .then(() => {
+                    // Show confirmation message
+                    const confirmationMessage = document.getElementById("confirmationMessage");
+                    confirmationMessage.style.display = "block";
+                    // Hide the confirmation message after 3 seconds
+                    setTimeout(() => {
+                        confirmationMessage.style.display = "none";
+                    }, 3000);
+                })
+                .catch(err => console.error(err.toString()));
+        }
+    </script>
     <div class="countdown" id="countdown">@Model.RemainingTime</div>
 
     <script>
