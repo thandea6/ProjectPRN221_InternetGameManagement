@@ -59,7 +59,7 @@ namespace ProjectPRN221_InternetGameManagement
             });
             app.MapHub<TimeHub>("/TimeHub"); // Map SignalR hub
             app.MapHub<OrderHub>("/orderHub");
-
+            app.MapHub<SignalRServer>("/SignalRServer");
             app.MapRazorPages();
 
             app.Run();

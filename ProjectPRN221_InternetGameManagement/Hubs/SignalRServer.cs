@@ -16,5 +16,6 @@ namespace ProjectPRN221_InternetGameManagement.Hubs
                 await InternetGameManagementContext.Ins.SaveChangesAsync();
             }
 
+        }
     }
 }
