@@ -16,6 +16,13 @@ namespace ProjectPRN221_InternetGameManagement
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddAuthentication("CookieAuth")
+            .AddCookie("CookieAuth", config =>
+            {
+                 config.Cookie.Name = "UserLoginCookie";
+                 config.LoginPath = "/Account/Login";
+            });
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session là 30 phút
