@@ -6,16 +6,28 @@ namespace ProjectPRN221_InternetGameManagement.Hubs
 {
     public class SignalRServer : Hub
     {
-        public async Task UpdateRemainingTime(int userId, int remainingTime)
+        public async Task SendMessageToServer(string user, string message)
         {
-            // Cập nhật dữ liệu vào database
-            var user = await InternetGameManagementContext.Ins.Accounts.FindAsync(userId);
-            if (user != null)
+            try
             {
-                user.Time = remainingTime;  // Cập nhật thời gian còn lại trong database
-                await InternetGameManagementContext.Ins.SaveChangesAsync();
+                if (!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(message))
+                {
+                    // Broadcast the message to all connected clients
+                    await Clients.All.SendAsync("ReceiveMessage", user, message);
+                }
+                else
+                {
+                    // Log an error or handle the case where user or message is null/empty
+                    throw new ArgumentException("User or message is missing.");
+                }
             }
-
+            catch (Exception ex)
+            {
+                // Log the exception with more details
+                Console.WriteLine($"Error in SendMessageToAdmin: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
         }
     }
 }

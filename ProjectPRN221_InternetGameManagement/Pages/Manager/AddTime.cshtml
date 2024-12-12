@@ -1,26 +1,29 @@
 ﻿@page
 @model ProjectPRN221_InternetGameManagement.Pages.Manager.AddTimeModel
 @{
-	ViewData["Title"] = "Deposit";
-	Layout = null; // Tắt layout cho trang này
-}
-<h2>Deposit Time for User</h2>
-
-<p>Current User: @Model.Username</p>
-<p>Current Time: @Model.CurrentTime minutes</p>
-
-<!-- Form nạp tiền -->
-<form method="post">
-    <div>
-        <label>Amount (VND)</label>
-        <input type="number" asp-for="Amount" min="0" required />
-    </div>
-    <button type="submit">Deposit</button>
-</form>
-
-@if (!string.IsNullOrEmpty(Model.SuccessMessage))
-{
-    <p style="color:green">@Model.SuccessMessage</p>
+    ViewData["Title"] = "Deposit";
+    Layout = "_Layout"; // Áp dụng layout chung của project
 }
 
-<button onclick="location.href='@Url.Page("/Manager/List")'">Back to List</button>
+<div class="container mt-5">
+    <h2 class="mb-4">Deposit Time for User</h2>
+
+    <p><strong>Current User:</strong> @Model.Username</p>
+    <p><strong>Current Time:</strong> @Model.CurrentTime minutes</p>
+
+    <!-- Form nạp tiền -->
+    <form method="post">
+        <div class="form-group mb-3">
+            <label for="Amount">Amount (VND)</label>
+            <input type="number" asp-for="Amount" class="form-control" min="0" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Deposit</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <p class="text-success mt-3">@Model.SuccessMessage</p>
+    }
+
+    <button onclick="location.href='@Url.Page("/Manager/List")'" class="btn btn-secondary mt-3">Back to List</button>
+</div>

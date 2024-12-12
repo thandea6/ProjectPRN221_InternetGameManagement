@@ -1,37 +1,40 @@
 ﻿@page
 @model ProjectPRN221_InternetGameManagement.Pages.Manager.AddUserModel
 @{
-	ViewData["Title"] = "Add User";
-	Layout = null; // Tắt layout cho trang này
-}
-<h2>Add User</h2>
-
-<!-- Nút Back để quay lại trang List -->
-<button onclick="location.href='@Url.Page("/Manager/List")'">Back to List</button>
-
-<!-- Form thêm người dùng mới -->
-<form method="post">
-    <div>
-        <label>Username</label>
-        <input type="text" asp-for="Username" required />
-    </div>
-    <div>
-        <label>Password</label>
-        <input type="password" asp-for="Password" required />
-    </div>
-    <div>
-        <label>Initial Time (minutes)</label>
-        <input type="number" asp-for="Time" min="0" required />
-    </div>
-    <button type="submit">Add User</button>
-</form>
-
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <p style="color:red">@Model.ErrorMessage</p>
+    ViewData["Title"] = "Add User";
+    Layout = "_Layout"; // Áp dụng layout chung của project
 }
 
-@if (!string.IsNullOrEmpty(Model.SuccessMessage))
-{
-    <p style="color:green">@Model.SuccessMessage</p>
-}
+<div class="container mt-5">
+    <h2 class="mb-4">Add User</h2>
+
+    <!-- Nút Back để quay lại trang List -->
+    <button onclick="location.href='@Url.Page("/Manager/List")'" class="btn btn-secondary mb-3">Back to List</button>
+
+    <!-- Form thêm người dùng mới -->
+    <form method="post">
+        <div class="form-group mb-3">
+            <label for="Username">Username</label>
+            <input type="text" asp-for="Username" class="form-control" required />
+        </div>
+        <div class="form-group mb-3">
+            <label for="Password">Password</label>
+            <input type="password" asp-for="Password" class="form-control" required />
+        </div>
+        <div class="form-group mb-3">
+            <label for="Time">Initial Time (minutes)</label>
+            <input type="number" asp-for="Time" class="form-control" min="0" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Add User</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="text-danger mt-3">@Model.ErrorMessage</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <p class="text-success mt-3">@Model.SuccessMessage</p>
+    }
+</div>

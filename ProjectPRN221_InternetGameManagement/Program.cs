@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using ProjectPRN221_InternetGameManagement.Hubs;
 using ProjectPRN221_InternetGameManagement.Models;
 
@@ -16,12 +17,7 @@ namespace ProjectPRN221_InternetGameManagement
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddAuthentication("CookieAuth")
-            .AddCookie("CookieAuth", config =>
-            {
-                 config.Cookie.Name = "UserLoginCookie";
-                 config.LoginPath = "/Account/Login";
-            });
+            builder.Services.AddSignalR(); // Thêm SignalR service
 
             builder.Services.AddSession(options =>
             {
