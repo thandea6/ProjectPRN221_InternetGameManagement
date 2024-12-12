@@ -22,16 +22,10 @@ namespace ProjectPRN221_InternetGameManagement
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             }); // Thêm session với cấu hình thời gian timeout
+
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddSignalR(); // Thêm SignalR
 
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-CSRF-TOKEN"; // Đặt tên header cho CSRF token
-            });
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "RequestVerificationToken";
-            });
 
             var app = builder.Build();
 
@@ -51,11 +45,12 @@ namespace ProjectPRN221_InternetGameManagement
             app.UseAuthorization();
             app.UseSession(); // Kích hoạt session
 
-            app.MapGet("/", async context =>
+            app.MapGet("/",  context =>
             {
                 context.Response.Redirect("/login");
+                return Task.CompletedTask;
             });
-            app.MapHub<SignalRServer>("/SignalRServer"); // Map SignalR hub
+            app.MapHub<TimeHub>("/TimeHub"); // Map SignalR hub
             app.MapHub<OrderHub>("/orderHub");
 
             app.MapRazorPages();

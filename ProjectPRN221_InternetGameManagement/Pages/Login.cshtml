@@ -79,7 +79,6 @@
 </head>
 <body>
     <!-- Form đăng nhập -->
-    <h1>Test github</h1>
     <div class="login-container">
         <h2>Login</h2>
         <form method="post">
@@ -99,5 +98,16 @@
             <p class="error-message">@Model.ErrorMessage</p>
         }
     </div>
+
+    @{
+        var errorMessage = TempData["ErrorMOfTime"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">
+            @errorMessage
+        </div>
+    }
 </body>
 </html>

@@ -43,8 +43,8 @@ namespace ProjectPRN221_InternetGameManagement.Pages.Manager
                 Id = u.Id,
                 Username = u.Username,
                 Role = u.Role,
-                FormattedTime = $"{u.Time / 60:D2}h{u.Time % 60:D2}m"
-            }).ToList();
+                FormattedTime = $"{u.Time / 3600:D2}h{(u.Time % 3600) / 60:D2}m{u.Time % 60:D2}s"
+        }).ToList();
 
             return Page();
         }
