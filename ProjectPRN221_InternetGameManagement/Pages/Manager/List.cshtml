@@ -2,63 +2,61 @@
 @model ProjectPRN221_InternetGameManagement.Pages.Manager.ListModel
 @{
     ViewData["Title"] = "Manage Users";
-    Layout = "_Layout"; // Áp dụng layout chung của project
+    Layout = null; // Không sử dụng layout
 }
 
-<div class="container mt-5">
-    <!-- Nút Logout và Product ở góc phải -->
-    <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 10px;">
-        <button onclick="location.href='@Url.Page("/Product/List")'" class="btn btn-outline-primary">Product</button>
-        <form method="post" asp-page-handler="Logout">
-            <button type="submit" class="btn btn-outline-danger">Logout</button>
-        </form>
-    </div>
-
-    <h2 class="mb-4">Manage Users</h2>
-
-    <!-- Bảng hiển thị danh sách người dùng -->
-    <button onclick="window.location.href='@Url.Page("/Manager/AddUser")'" class="btn btn-success mb-3">Add User</button>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model.Users)
-            {
-                <tr>
-                    <td>@user.Username</td>
-                    <td>@user.Role</td>
-                    <td>@user.FormattedTime</td>
-                    <td>
-                        <button onclick="location.href='@Url.Page("/Manager/Update", new { id = user.Id })'" class="btn btn-warning btn-sm">Update</button>
-                        <button onclick="confirmDelete('@user.Id')" class="btn btn-danger btn-sm">Delete</button>
-                        <button onclick="location.href='@Url.Page("/Manager/AddTime", new { id = user.Id })'" class="btn btn-info btn-sm">Deposit</button>
-                        <button onclick="location.href='@Url.Page("/Manager/Pay", new { accountId = user.Id })'" class="btn btn-secondary btn-sm">Pay</button>
-                        <button onclick="location.href='@Url.Page("/Manager/Chat", new { accountId = user.Id })'" class="btn btn-primary btn-sm">Chat</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <h3>Order Logs</h3>
-    <table class="table table-bordered" id="orderLogTable">
-        <thead>
-            <tr>
-                <th>Time</th>
-                <th>Message</th>
-            </tr>
-        </thead>
-        <tbody id="orderLogBody">
-            <!-- Thông báo sẽ được thêm qua SignalR -->
-        </tbody>
-    </table>
+<!-- Nút Logout và Product ở góc phải -->
+<div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 10px;">
+    <button onclick="location.href='@Url.Page("/Product/List")'" style="width: 100px; height: 40px;">Product</button>
+    <form method="post" asp-page-handler="Logout">
+        <button type="submit" style="width: 100px; height: 40px;">Logout</button>
+    </form>
 </div>
+
+<h2>Manage Users</h2>
+
+<!-- Bảng hiển thị danh sách người dùng -->
+<button onclick="window.location.href='@Url.Page("/Manager/AddUser")'">Add User</button>
+<table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>@user.Role</td>
+                <td>@user.FormattedTime</td>
+                <td>
+                    <button onclick="location.href='@Url.Page("/Manager/Update", new { id = user.Id })'">Update</button>
+                    <button onclick="confirmDelete('@user.Id')">Delete</button>
+                    <button onclick="location.href='@Url.Page("/Manager/AddTime", new { id = user.Id })'">Deposit</button>
+                    <button onclick="location.href='@Url.Page("/Manager/Pay", new { accountId = user.Id })'">Pay</button>
+                    <button onclick="location.href='@Url.Page("/Chat/Chat", new { accountId = user.Id })'">Chat</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Order Logs</h3>
+<table border="1" cellpadding="10" cellspacing="0" id="orderLogTable">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody id="orderLogBody">
+        <!-- Thông báo sẽ được thêm qua SignalR -->
+    </tbody>
+</table>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
 <script>

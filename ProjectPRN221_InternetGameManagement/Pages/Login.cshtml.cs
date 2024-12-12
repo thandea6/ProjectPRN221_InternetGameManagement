@@ -20,6 +20,16 @@ namespace ProjectPRN221_InternetGameManagement.Pages
         [BindProperty]
         public string Password { get; set; }
         public string ErrorMessage { get; set; }
+        public IActionResult OnGet()
+        {
+            var message = Request.Query["message"];
+            if (!string.IsNullOrEmpty(message))
+            {
+                TempData["ErrorMOfTime"] = message;  // Lýu thông báo vào TempData
+            }
+
+            return Page();
+        }
 
         public IActionResult OnPost()
         {
@@ -29,6 +39,7 @@ namespace ProjectPRN221_InternetGameManagement.Pages
             {
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserRole", user.Role);
+                HttpContext.Session.SetString("Username", user.Username);
 
                 return RedirectToPage("/User/UserScreen");
             }
@@ -36,6 +47,7 @@ namespace ProjectPRN221_InternetGameManagement.Pages
             {
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserRole", user.Role);
+                HttpContext.Session.SetString("Username", user.Username);
 
                 return RedirectToPage("/Manager/List");
             }

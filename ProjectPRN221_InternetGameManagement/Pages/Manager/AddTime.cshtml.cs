@@ -49,7 +49,7 @@ namespace ProjectPRN221_InternetGameManagement.Pages.Manager
             }
 
             // Chuyển đổi số tiền thành thời gian không làm tròn
-            double additionalTime = (Amount * 60.0) / 3000.0;
+            double additionalTime = ((Amount * 60.0) / 3000.0) * 60;
 
             // Cộng thêm thời gian vào tài khoản người dùng
             user.Time = (user.Time ?? 0) + (int)additionalTime;

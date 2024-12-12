@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using ProjectPRN221_InternetGameManagement.Hubs;
 using ProjectPRN221_InternetGameManagement.Models;
 
@@ -16,12 +17,7 @@ namespace ProjectPRN221_InternetGameManagement
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddAuthentication("CookieAuth")
-            .AddCookie("CookieAuth", config =>
-            {
-                 config.Cookie.Name = "UserLoginCookie";
-                 config.LoginPath = "/Account/Login";
-            });
+            builder.Services.AddSignalR(); // Thêm SignalR service
 
             builder.Services.AddSession(options =>
             {
@@ -29,16 +25,10 @@ namespace ProjectPRN221_InternetGameManagement
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             }); // Thêm session với cấu hình thời gian timeout
+
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddSignalR(); // Thêm SignalR
 
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-CSRF-TOKEN"; // Đặt tên header cho CSRF token
-            });
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "RequestVerificationToken";
-            });
 
             var app = builder.Build();
 
@@ -58,11 +48,12 @@ namespace ProjectPRN221_InternetGameManagement
             app.UseAuthorization();
             app.UseSession(); // Kích hoạt session
 
-            app.MapGet("/", async context =>
+            app.MapGet("/",  context =>
             {
                 context.Response.Redirect("/login");
+                return Task.CompletedTask;
             });
-            app.MapHub<SignalRServer>("/SignalRServer"); // Map SignalR hub
+            app.MapHub<TimeHub>("/TimeHub"); // Map SignalR hub
             app.MapHub<OrderHub>("/orderHub");
 
             app.MapRazorPages();

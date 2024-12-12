@@ -1,10 +1,7 @@
 ﻿@page
-@using Microsoft.AspNetCore.Antiforgery
 @model ProjectPRN221_InternetGameManagement.Pages.User.UserScreenModel
-@inject IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "User Page";
-    var antiforgeryToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
     Layout = null;
 }
 
@@ -94,158 +91,62 @@
 </head>
 <body>
     <div class="top-right">
+        <button class="button" onclick="location.href='@Url.Page("/Chat/Chat")'">Chat</button>
         <button class="button buy-button" onclick="location.href='@Url.Page("/Product/Buy")'">Buy</button>
-        <button class="button logout-button" onclick="logout()">Logout</button>
+        <form method="post">
+            <button class="button logout-button" type="submit">Logout</button>
+        </form>
     </div>
-    <div class="chat-container">
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Message" />
-            <button class="send-button" onclick="sendMessage()">Send</button>
-        </div>
-        <ul id="messagesList"></ul>
-        <div id="confirmationMessage" style="display: none; color: green; margin-top: 10px;">Message sent!</div>
-    </div>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
-    <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/SignalRServer")
-            .build();
-
-        connection.on("ReceiveMessage", (user, message) => {
-            const li = document.createElement("li");
-            li.textContent = `${user}: ${message}`;
-            document.getElementById("messagesList").appendChild(li);
-        });
-
-        connection.start().catch(err => console.error(err.toString()));
-
-        function sendMessage() {
-            const message = document.getElementById("messageInput").value;
-            connection.invoke("SendMessageToAdmin", message)
-                .then(() => {
-                    // Show confirmation message
-                    const confirmationMessage = document.getElementById("confirmationMessage");
-                    confirmationMessage.style.display = "block";
-                    // Hide the confirmation message after 3 seconds
-                    setTimeout(() => {
-                        confirmationMessage.style.display = "none";
-                    }, 3000);
-                })
-                .catch(err => console.error(err.toString()));
-        }
-    </script>
     <div class="countdown" id="countdown">@Model.RemainingTime</div>
 
-    <script>
-        const userId = @HttpContext.Session.GetInt32("UserId");  // Lấy UserId từ Session
-        let remainingTime = @Model.RemainingMinutes * 60; // Thời gian còn lại tính bằng giây
 
-        // Tạo kết nối SignalR
+    <script>
+        const countdownElement = document.getElementById("countdown");
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/SignalRServer")  // Đổi thành URL Hub SignalR của bạn
+            .withUrl("/TimeHub")  // URL SignalR Hub
             .build();
 
-        // Hàm để cập nhật thời gian trên server thông qua SignalR
-        function updateTimeOnServer(time) {
-            connection.invoke("UpdateRemainingTime", userId, time)
-                .catch(err => console.error("Error while sending time to server: ", err));
-        }
-
-        // Hàm cập nhật thời gian đếm ngược trên client
-        function updateCountdown() {
-            if (remainingTime <= 0) {
-                document.getElementById('countdown').textContent = "00h00m00s";
-                updateTimeOnServer(0); // Gửi thời gian còn lại bằng 0 khi hết giờ
-                return;
-            }
-
-            remainingTime--;
-
-            const hours = Math.floor(remainingTime / 3600);
-            const minutes = Math.floor((remainingTime % 3600) / 60);
-            const seconds = remainingTime % 60;
-
-            document.getElementById('countdown').textContent = `${String(hours).padStart(2, '0')}h${String(minutes).padStart(2, '0')}m${String(seconds).padStart(2, '0')}s`;
-
-            // Gửi thời gian mỗi giây lên server để đồng bộ
-            updateTimeOnServer(remainingTime);
-
-            setTimeout(updateCountdown, 1000);
-        }
-
-        // Bắt đầu đếm ngược khi trang tải xong
+        // Kết nối SignalR
         connection.start().then(() => {
-            console.log("SignalR connection established.");
-            setTimeout(updateCountdown, 1000);  // Bắt đầu đếm ngược
-        }).catch(err => {
-            console.error("Error while starting SignalR connection: ", err);
-        });
+            console.log("SignalR DA DUOC KET NOI ROI!!!.");
+        }).catch(err => console.error("SignalR DANG BI LOI:", err));
 
-        function logout() {
-            const remainingMinutes = Math.ceil(remainingTime / 60);
-            updateTimeOnServer(remainingMinutes); // Lưu thời gian trước khi đăng xuất
-            location.href = '@Url.Page("/Login")';
-        }
-    </script>
+        let remainingTime = @HttpContext.Session.GetInt32("RemainingTime") ? @HttpContext.Session.GetInt32("RemainingTime") : 0;
+        const userId = @HttpContext.Session.GetInt32("UserId");
 
-        @* <script>
-            const userId = @HttpContext.Session.GetInt32("UserId");  // Lấy UserId từ Session
-            let remainingTime = @Model.RemainingMinutes * 60; // Thời gian còn lại tính bằng giây
-
-            // Tạo kết nối SignalR
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl("/gameHub")  // URL SignalR Hub
-                .build();
-
-            // Hàm để cập nhật thời gian trên server thông qua SignalR
-            async function updateTimeOnServer(time) {
-                try {
-                    // Gọi SignalR Hub để cập nhật thời gian còn lại trên server
-                    await connection.invoke("UpdateRemainingTime", userId, time);
-                } catch (err) {
-                    console.error("Error while sending time to server: ", err);
-                }
-            }
-
-            // Hàm đếm ngược thời gian
-            function updateCountdown() {
-                if (remainingTime <= 0) {
-                    document.getElementById('countdown').textContent = "00h00m00s";
-                    updateTimeOnServer(0);  // Cập nhật thời gian lên server khi hết giờ
-                    return;
-                }
-
+        // Cập nhật countdown mỗi giây
+        const updateTime = () => {
+            if (remainingTime > 0) {
                 remainingTime--;
+                countdownElement.textContent = formatTime(remainingTime);
 
-                const hours = Math.floor(remainingTime / 3600);
-                const minutes = Math.floor((remainingTime % 3600) / 60);
-                const seconds = remainingTime % 60;
+                // Lưu lại thời gian vào sessionStorage
+                sessionStorage.setItem("remainingTime", remainingTime);
 
-                document.getElementById('countdown').textContent = `${String(hours).padStart(2, '0')}h${String(minutes).padStart(2, '0')}m${String(seconds).padStart(2, '0')}s`;
-
-                setTimeout(updateCountdown, 1000);
-
-                // Cập nhật thời gian lên server mỗi 10 giây (hoặc tuỳ theo nhu cầu)
-                if (remainingTime % 10 === 0) {
-                    updateTimeOnServer(remainingTime / 60);  // Cập nhật thời gian còn lại (tính bằng phút)
-                }
+                // Gửi thời gian lên server thông qua SignalR
+                connection.invoke("UpdateTime", userId, remainingTime).catch(err => console.error(err));
+            }
+            else if (remainingTime <= 0) {
+                window.location.href = "/Login?message=Bạn đã hết tiền, cần nạp thêm để sử dụng dịch vụ.";
             }
 
-            // Bắt đầu đếm ngược
-            setTimeout(updateCountdown, 1000);
+        };
 
-            // Kết nối SignalR khi trang được tải
-            connection.start().catch(function (err) {
-                return console.error(err.toString());
-            });
+        // Hàm định dạng thời gian
+        const formatTime = (time) => {
+            const hours = Math.floor(time / 3600); // Tính số giờ
+            const minutes = Math.floor((time % 3600) / 60); // Tính số phút còn lại
+            const seconds = time % 60; // Tính số giây còn lại
 
-        function logout() {
-            const remainingMinutes = Math.ceil(remainingTime / 60);
-            updateTimeOnServer(remainingMinutes); // Lưu thời gian trước khi đăng xuất
-            location.href = '@Url.Page("/Login")';
-        }
-        </script> *@
+            // Trả về định dạng HH:MM:SS, nếu giờ = 0 thì bỏ qua phần giờ
+            return hours > 0
+                ? `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+                : `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        };
+
+        // Bắt đầu countdown
+        setInterval(updateTime, 1000);
+
+    </script>
 </body>
 </html>
