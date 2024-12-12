@@ -20,6 +20,16 @@ namespace ProjectPRN221_InternetGameManagement.Pages
         [BindProperty]
         public string Password { get; set; }
         public string ErrorMessage { get; set; }
+        public IActionResult OnGet()
+        {
+            var message = Request.Query["message"];
+            if (!string.IsNullOrEmpty(message))
+            {
+                TempData["ErrorMOfTime"] = message;  // Lýu thông báo vào TempData
+            }
+
+            return Page();
+        }
 
         public IActionResult OnPost()
         {
