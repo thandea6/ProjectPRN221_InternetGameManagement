@@ -38,7 +38,7 @@
                     <button onclick="confirmDelete('@user.Id')">Delete</button>
                     <button onclick="location.href='@Url.Page("/Manager/AddTime", new { id = user.Id })'">Deposit</button>
                     <button onclick="location.href='@Url.Page("/Manager/Pay", new { accountId = user.Id })'">Pay</button>
-                    <button onclick="location.href='@Url.Page("/Manager/Chat", new { accountId = user.Id })'">Chat</button>
+                    <button onclick="location.href='@Url.Page("/Chat/Chat", new { accountId = user.Id })'">Chat</button>
                 </td>
             </tr>
         }

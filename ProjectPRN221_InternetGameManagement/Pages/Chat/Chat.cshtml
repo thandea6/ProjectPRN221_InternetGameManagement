@@ -1,0 +1,75 @@
+﻿@page "/Chat/Chat"
+@model ProjectPRN221_InternetGameManagement.Pages.User.ChatModel
+@{
+    ViewData["Title"] = "User Chat";
+    Layout = null;
+    var user = Model.Username;
+ }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    @if (Model.UserRole == "user")
+    {
+        <div style="position: absolute; top: 10px; right: 10px;">
+            <button onclick="location.href='@Url.Page("/User/UserScreen")'">Back</button>
+        </div>
+    }
+    else if (Model.UserRole == "manager")
+    {
+        <div style="position: absolute; top: 10px; right: 10px;">
+            <button onclick="location.href='@Url.Page("/Manager/List")'">Back</button>
+        </div>
+    }
+    <div class="chat-container">
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Message" />
+            <button class="send-button" onclick="sendMessage()">Send</button>
+        </div>
+        <ul id="messagesList"></ul>
+        <div id="confirmationMessage" style="display: none; color: green; margin-top: 10px;">Message sent!</div>
+        <div id="errorMessage" style="display: none; color: red; margin-top: 10px;">Error sending message!</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script> 
+    <script src="/js/site.js"></script> 
+
+    <script>
+        const user = "@user";
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value.trim();
+
+            if (message) {
+                connection.invoke("SendMessageToServer", user, message)
+                    .then(() => {
+                        // Show confirmation message
+                        const confirmationMessage = document.getElementById("confirmationMessage");
+                        confirmationMessage.style.display = "block";
+                        setTimeout(() => {
+                            confirmationMessage.style.display = "none";
+                        }, 3000);
+                        // Clear input field
+                        messageInput.value = "";
+                    })
+                    .catch(err => {
+                        console.error("Error sending message:", err);
+                        // Show error message
+                        const errorMessage = document.getElementById("errorMessage");
+                        errorMessage.style.display = "block";
+                        setTimeout(() => {
+                            errorMessage.style.display = "none";
+                        }, 3000);
+                    });
+            } else {
+                alert("Please enter a message before sending!");
+            }
+        }
+    </script>
+</body>
+</html>
