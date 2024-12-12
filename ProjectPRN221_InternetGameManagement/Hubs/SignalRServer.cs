@@ -15,6 +15,6 @@ namespace ProjectPRN221_InternetGameManagement.Hubs
                 user.Time = remainingTime;  // Cập nhật thời gian còn lại trong database
                 await InternetGameManagementContext.Ins.SaveChangesAsync();
             }
-
+        }
     }
 }

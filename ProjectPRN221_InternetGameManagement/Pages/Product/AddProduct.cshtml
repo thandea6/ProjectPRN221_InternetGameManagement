@@ -1,37 +1,36 @@
 ﻿@page
 @model ProjectPRN221_InternetGameManagement.Pages.Product.AddProductModel
 @{
-	ViewData["Title"] = "Add Product";
-	Layout = null;
+    ViewData["Title"] = "Add Product";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
-<!-- Nút "Back" để quay lại trang danh sách sản phẩm -->
-<div style="position: absolute; top: 10px; right: 10px;">
-    <button onclick="location.href='@Url.Page("/Product/List")'">Back to Product List</button>
+<div class="container mt-5">
+    <div class="text-end">
+        <button class="btn btn-secondary" onclick="location.href='@Url.Page("/Product/List")'">Back to Product List</button>
+    </div>
+
+    <h2 class="text-center">Add New Product</h2>
+
+    <form method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Product Name:</label>
+            <input type="text" id="Name" name="Name" asp-for="Product.Name" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="Category" class="form-label">Category:</label>
+            <select id="Category" name="Category" asp-for="Product.Category" asp-items="Model.Categories" class="form-select" required>
+                <option value="">-- Select Category --</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="Price" class="form-label">Price:</label>
+            <input type="number" id="Price" name="Price" asp-for="Product.Price" class="form-control" required step="0.01" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Product</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="text-danger mt-3">@Model.ErrorMessage</p>
+    }
 </div>
-
-<h2>Add New Product</h2>
-
-<!-- Form để nhập thông tin sản phẩm -->
-<form method="post">
-    <div>
-        <label for="Name">Product Name:</label>
-        <input type="text" id="Name" name="Name" asp-for="Product.Name" required />
-    </div>
-    <div>
-        <label for="Category">Category:</label>
-        <select id="Category" name="Category" asp-for="Product.Category" asp-items="Model.Categories" required>
-            <option value="">-- Select Category --</option>
-        </select>
-    </div>
-    <div>
-        <label for="Price">Price:</label>
-        <input type="number" id="Price" name="Price" asp-for="Product.Price" required step="0.01" />
-    </div>
-    <button type="submit">Add Product</button>
-</form>
-
-<!-- Hiển thị lỗi nếu có -->
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <p style="color: red;">@Model.ErrorMessage</p>
-}

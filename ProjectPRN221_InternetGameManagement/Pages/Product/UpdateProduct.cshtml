@@ -2,35 +2,36 @@
 @model ProjectPRN221_InternetGameManagement.Pages.Product.UpdateProductModel
 @{
     ViewData["Title"] = "Update Product";
-    Layout = null;
+    Layout = "~/Pages/Shared/_Layout.cshtml"; // Sử dụng layout chung
 }
 
-<h2>Update Product</h2>
-
-<form method="post">
-    <!-- Trường ẩn cho ID sản phẩm -->
-    <input type="hidden" asp-for="Product.Id" />
-
-    <!-- Hiển thị tên sản phẩm dưới dạng chỉ đọc -->
-    <div>
-        <label>Name:</label>
-        <input asp-for="Product.Name" readonly />
-        <span asp-validation-for="Product.Name" class="text-danger"></span>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Update Product</h2>
+        <button class="btn btn-secondary" onclick="location.href='@Url.Page("/Product/List")'">Back to Product List</button>
     </div>
 
-    <!-- Hiển thị category dưới dạng chỉ đọc -->
-    <div>
-        <label>Category:</label>
-        <input asp-for="Product.Category" readonly />
-        <span asp-validation-for="Product.Category" class="text-danger"></span>
-    </div>
+    <form method="post" class="card p-4 shadow-sm">
+        <input type="hidden" asp-for="Product.Id" />
 
-    <!-- Cho phép cập nhật giá sản phẩm -->
-    <div>
-        <label>Price:</label>
-        <input asp-for="Product.Price" />
-        <span asp-validation-for="Product.Price" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input id="name" asp-for="Product.Name" class="form-control" readonly />
+            <span asp-validation-for="Product.Name" class="text-danger"></span>
+        </div>
 
-    <button type="submit">Update</button>
-</form>
+        <div class="mb-3">
+            <label for="category" class="form-label">Category:</label>
+            <input id="category" asp-for="Product.Category" class="form-control" readonly />
+            <span asp-validation-for="Product.Category" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input id="price" asp-for="Product.Price" class="form-control" />
+            <span asp-validation-for="Product.Price" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>

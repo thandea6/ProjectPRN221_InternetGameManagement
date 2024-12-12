@@ -2,97 +2,101 @@
 @model ProjectPRN221_InternetGameManagement.Pages.Product.BuyModel
 @{
     ViewData["Title"] = "Buy Product";
-    Layout = null;
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
-<h2>Select Product</h2>
+<div class="container mt-5">
+    <h2 class="text-center">Select Product</h2>
 
-<div style="position: absolute; top: 10px; right: 10px;">
-    <button onclick="location.href='@Url.Page("/User/UserScreen")'">Back</button>
+    <div class="text-end mb-3">
+        <button class="btn btn-secondary" onclick="location.href='@Url.Page("/User/UserScreen")'">Back</button>
+    </div>
+
+    <div class="mb-3">
+        <label for="categoryFilter" class="form-label">Filter by Category:</label>
+        <select id="categoryFilter" asp-for="SelectedCategory" asp-items="Model.Categories" class="form-select" onchange="filterProducts()">
+            <option value="">All Categories</option>
+        </select>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productList">
+            @foreach (var product in Model.FilteredProducts)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Category</td>
+                    <td>@product.Price</td>
+                    <td>
+                        <form method="post" asp-page-handler="AddToCart" class="d-inline">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <button class="btn btn-primary" type="submit">Add to Cart</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h3 class="mt-5">Cart</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody id="cartItems">
+            @foreach (var detail in Model.BillDetails)
+            {
+                <tr>
+                    <td>@Model.FilteredProducts.FirstOrDefault(p => p.Id == detail.ProductId)?.Name</td>
+                    <td>@detail.Quantity</td>
+                    <td>@detail.Price</td>
+                    <td>@detail.TotalPrice</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="fw-bold">Total: $<span id="totalAmount">@Model.TotalAmount</span></p>
+
+    <form method="post" asp-page-handler="SubmitCart" class="text-end">
+        <button class="btn btn-success" type="submit">Submit Cart</button>
+    </form>
+
+    <h3 class="mt-5">Order History</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>Order Time</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody id="orderHistoryItems">
+            @foreach (var order in Model.OrderHistory)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.OrderTime</td>
+                    <td>@order.TotalAmount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
-
-<label for="categoryFilter">Filter by Category:</label>
-<select id="categoryFilter" asp-for="SelectedCategory" asp-items="Model.Categories" onchange="filterProducts()">
-    <option value="">All Categories</option>
-</select>
-
-<table border="1" cellpadding="10" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Product ID</th>
-            <th>Product Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="productList">
-        @foreach (var product in Model.FilteredProducts)
-        {
-            <tr>
-                <td>@product.Id</td>
-                <td>@product.Name</td>
-                <td>@product.Category</td>
-                <td>@product.Price</td>
-                <td>
-                    <form method="post" asp-page-handler="AddToCart">
-                        <input type="hidden" name="productId" value="@product.Id" />
-                        <button type="submit">Add to Cart</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<h3>Cart</h3>
-<table border="1" cellpadding="10" cellspacing="0" id="cartTable">
-    <thead>
-        <tr>
-            <th>Product Name</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total Price</th>
-        </tr>
-    </thead>
-    <tbody id="cartItems">
-        @foreach (var detail in Model.BillDetails)
-        {
-            <tr>
-                <td>@Model.FilteredProducts.FirstOrDefault(p => p.Id == detail.ProductId)?.Name</td>
-                <td>@detail.Quantity</td>
-                <td>@detail.Price</td>
-                <td>@detail.TotalPrice</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<p>Total: $<span id="totalAmount">@Model.TotalAmount</span></p>
-
-<form method="post" asp-page-handler="SubmitCart">
-    <button type="submit">Submit Cart</button>
-</form>
-
-<h3>Order History</h3>
-<table border="1" cellpadding="10" cellspacing="0" id="orderHistoryTable">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Order Time</th>
-            <th>Total Amount</th>
-        </tr>
-    </thead>
-    <tbody id="orderHistoryItems">
-        @foreach (var order in Model.OrderHistory)
-        {
-            <tr>
-                <td>@order.Id</td>
-                <td>@order.OrderTime</td>
-                <td>@order.TotalAmount</td>
-            </tr>
-        }
-    </tbody>
-</table>
 
 <script>
     function filterProducts() {
